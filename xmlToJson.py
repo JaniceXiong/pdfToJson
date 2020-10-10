@@ -83,8 +83,13 @@ class XmlToJson(object):
                 return rtext + " <ref>"
 
 
-    def _getText(self, tag):
+    def _getText(self, tag, ptext):
         text = ""
+        if(ptext != ""):
+            text = ptext
+        else:
+            text = ""
+        
         for child in tag.children:
             if (isinstance(child, NavigableString)):
                 if (child == '\n'):
@@ -108,6 +113,7 @@ class XmlToJson(object):
         figs = s_body.find_all('figure')
         key0 = {}.keys()
         cnt = 3
+        whitespace = ['\n',' ']
 
         for i, div in enumerate(divs):
 
@@ -135,11 +141,24 @@ class XmlToJson(object):
                         if (flag):
                             # append the text to precious p
                             _dtext = []
+                            _ptext = ""
                             for child in div.children:
-                                if (isinstance(child, NavigableString)
-                                        and child == '\n'):
+                                if (isinstance(child, NavigableString) and child in whitespace):
                                     continue
-                                _dtext.append(self._getText(child))
+
+                                if child.name == 'head':
+                                    continue
+                                
+                                if(child.name == 'formula'):
+                                    #_ptext += self._dealFormula(child)
+                                    dtext.append(self._dealFormula(child))
+                                elif(child.name == 'ref'):
+                                    _ptext += self._dealRef(child)
+                                    #dtext.append(self._dealRef(child))
+                                else:
+                                    #p
+                                    dtext.append(self._getText(child,_ptext))
+                                    _ptext = ""
                             self.papertext[-1] += _dtext
                             continue
 
@@ -165,19 +184,24 @@ class XmlToJson(object):
                 continue
 
             dtext = []
+            ptext = ""
             for child in div.children:
-                if (isinstance(child, NavigableString) and child == '\n'):
+                if (isinstance(child, NavigableString) and child in whitespace):
                     continue
 
                 if child.name == 'head':
                     continue
                 
                 if(child.name == 'formula'):
+                    #ptext += self._dealFormula(child)
                     dtext.append(self._dealFormula(child))
                 elif(child.name == 'ref'):
-                    dtext.append(self._dealRef(child))
+                    ptext += self._dealRef(child)
+                    #dtext.append(self._dealRef(child))
                 else:
-                    dtext.append(self._getText(child))
+                    #p
+                    dtext.append(self._getText(child,ptext))
+                    ptext = ""
 
             self.bookmarks.append(dtitle)
             self.papertext.append(dtext)
