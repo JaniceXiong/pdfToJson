@@ -309,18 +309,6 @@ class XmlToJson(object):
         }
 
         return self.data
-"""
-if __name__ == '__main__':
-    xml_path = "10.pdf.tei.xml"
-    with open(xml_path,'r',encoding='utf-8') as f:
-        tei = f.read()
-    
-    tool = XmlToJson()
-    data = tool.run(tei)
 
-    json_path = "10.json"
-    with open(json_path,'w') as f:
-        json.dump(data,f)
-"""
 
     
