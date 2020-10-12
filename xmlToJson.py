@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString
 import json
-
+import string
 
 class XmlToJson(object):
     def init(self, tei):
@@ -68,19 +68,19 @@ class XmlToJson(object):
             rtext = tag.text
 
             if(rtype == 'bibr'):
-                return rtext + " <ref" + rid_str + ">" # (Nagai 2002) <ref id=b13>
+                return rtext + "<ref" + rid_str + ">" # (Nagai 2002) <ref id=b13>
             elif(rtype == 'table'):
-                return rtext + " <table" + rid_str + ">"
+                return rtext + "<table" + rid_str + ">"
             elif(rtype == 'figure'):
-                return rtext + " <figure" + rid_str + ">"
+                return rtext + "<figure" + rid_str + ">"
             else:
-                return rtext + " <" + rtype + rid_str + ">"
+                return rtext + "<" + rtype + rid_str + ">"
         else:
             rtext = tag.text
             if(rtext == ""):
                 return "<ref>"
             else:
-                return rtext + " <ref>"
+                return rtext + "<ref>"
 
 
     def _getText(self, tag, ptext):
@@ -94,14 +94,25 @@ class XmlToJson(object):
             if (isinstance(child, NavigableString)):
                 if (child == '\n'):
                     continue
-                text += " " + child
+                #text += " " + child
+                if (child[0] in string.punctuation):
+                    text = text.strip() + child.strip()
+                else:
+                    text = text.strip() + " " + child.strip()
             else:
                 if(child.name == 'formula'):
-                    text += " " + self._dealFormula(child)
+                    #text += " " + self._dealFormula(child)
+                    text = text.strip() + " " + self._dealFormula(child)
                 elif(child.name == 'ref'): #type=bibr/table/figure
-                    text += " " + self._dealRef(child)
+                    #text += " " + self._dealRef(child)
+                    text = text.strip() + " " + self._dealRef(child)
                 else:
-                    text += " " + child.text
+                    #text += " " + child.text
+                    child_text = child.text
+                    if (child_text[0] in string.punctuation):
+                        text = text.strip() + child_text.strip()
+                    else:
+                        text = text.strip() + " " + child_text.strip()
         
         return text.strip()
 
