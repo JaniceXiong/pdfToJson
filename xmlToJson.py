@@ -162,13 +162,13 @@ class XmlToJson(object):
                                 
                                 if(child.name == 'formula'):
                                     #_ptext += self._dealFormula(child)
-                                    dtext.append(self._dealFormula(child))
+                                    _dtext.append(self._dealFormula(child))
                                 elif(child.name == 'ref'):
                                     _ptext += self._dealRef(child)
                                     #dtext.append(self._dealRef(child))
                                 else:
                                     #p
-                                    dtext.append(self._getText(child,_ptext))
+                                    _dtext.append(self._getText(child,_ptext))
                                     _ptext = ""
                             self.papertext[-1] += _dtext
                             continue
